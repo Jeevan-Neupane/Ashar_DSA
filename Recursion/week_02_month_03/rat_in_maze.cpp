@@ -2,32 +2,42 @@
 #include <vector>
 using namespace std;
 
-string path(vector<vector<int>> &m, int n, int rPos, int colPos, string p, vector<string> &pathlist)
+void path(vector<vector<int>> &m, int n, int rPos, int colPos, vector<char> ans, vector<vector<char>> &pathlist, vector<vector<int>> &vis)
+
 {
+    // cout << " i am here" << rPos << " " << colPos << endl;
     if (rPos == n - 1 && colPos == n - 1)
     {
-        pathlist.push_back(p);
-        return p;
+        // for (int i = 0; i < ans.size(); i++)
+        // {
+        //     cout << ans[i] << " ";
+        // }
+        // cout << endl;
+        pathlist.push_back(ans);
+        return;
     }
 
     int rDir[] = {-1, 0, 1, 0};
     int cDir[] = {0, -1, 0, 1};
-    char dir[] = {'D', 'L', 'U', 'R'};
+
+    char dir[] = {'U', 'L', 'D', 'R'};
 
     for (int i = 0; i < 4; i++)
     {
         int newRowPos = rPos + rDir[i];
         int newColPos = colPos + cDir[i];
 
-        if (newRowPos >= 0 && newRowPos < n && newColPos >= 0 && newColPos < n - 1 && m[newColPos][newRowPos] == 1)
+        if (newRowPos >= 0 && newRowPos < n && newColPos >= 0 && newColPos < n && m[newRowPos][newColPos] == 1 && vis[newRowPos][newColPos] == 0)
         {
-            cout << newRowPos << " " << newColPos << endl;
-            p += dir[i];
-            path(m, n, newRowPos, newColPos, p, pathlist);
+            ans.push_back(dir[i]);
+            vis[newRowPos][newColPos] = 1;
+            // cout << dir[i] << endl;
+            // cout << "i am here" << newRowPos << " " << newColPos << endl;
+            path(m, n, newRowPos, newColPos, ans, pathlist, vis);
+            vis[newRowPos][newColPos] = 0;
+            ans.pop_back();
         }
     }
-
-    return "";
 }
 
 vector<string> findPath(vector<vector<int>> &m, int n)
@@ -35,27 +45,46 @@ vector<string> findPath(vector<vector<int>> &m, int n)
     // Your code goes here
     string p = "";
 
-    vector<string> pathList;
+    if (m[0][0] == 0)
+    {
+        return {"-1"};
+    }
+    vector<vector<char>> pathList;
+    vector<vector<int>> visited(n, vector<int>(n, 0));
 
-    string ans = path(m, n, 0, 0, p, pathList);
+    visited[0][0] = 1;
 
-    cout << ans << endl;
+    vector<char> ans;
 
-    return pathList;
+    path(m, n, 0, 0, ans, pathList, visited);
+
+    vector<string> pathString;
+
+    for (int i = 0; i < pathList.size(); i++)
+    {
+        string s = "";
+        for (int j = 0; j < pathList[i].size(); j++)
+        {
+            s += pathList[i][j];
+        }
+        pathString.push_back(s);
+    }
+
+    if (pathString.size() == 0)
+        pathString.push_back("-1");
+
+    return pathString;
 }
 
 int main()
 {
-    //     N = 4
-    // m[][] = {{1, 0, 0, 0},
-    //          {1, 1, 0, 1},
-    //          {1, 1, 0, 0},
-    //          {0, 1, 1, 1}}
+    //     4
+    // 0 1 1 1 1 1 1 0 1 0 1 1 0 0 1 1
 
-    vector<vector<int>> m = {{1, 0, 0, 0},
-                             {1, 1, 0, 1},
-                             {1, 1, 0, 0},
-                             {0, 1, 1, 1}};
+    vector<vector<int>> m = {{1, 0, 1, 1},
+                             {0, 0, 0, 1},
+                             {0, 1, 0, 0},
+                             {1, 1, 1, 1}};
 
     int n = 4;
 
